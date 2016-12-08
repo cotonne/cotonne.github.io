@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Hexagonal architecture is dead… Long live to hexagonal architecture!"
-date:   2016-12-08 08:42:27 +0100
+date:   2016-12-08 08:43:27 +0100
 categories: architecture craft
 ---
 
