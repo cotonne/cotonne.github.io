@@ -32,5 +32,5 @@ exclude:
   - Gemfile
   - Gemfile.lock
 disqus:
-  shortname: cotonne-github-io.disqus.com
+  shortname: cotonne-github-io
 google_analytics: UA-88626974-1
