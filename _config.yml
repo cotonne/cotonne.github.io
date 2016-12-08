@@ -31,3 +31,6 @@ gems:
 exclude:
   - Gemfile
   - Gemfile.lock
+disqus:
+  shortname: cotonne
+google_analytics: UA-88626974-1
