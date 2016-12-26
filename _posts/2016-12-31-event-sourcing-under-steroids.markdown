@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Event Sourcing under steroids!"
-date:   2016-12-31 08:42:27 +0100
+date:   2016-12-21 08:42:27 +0100
 categories: event sourcing aws lambda cqrs
 ---
 
@@ -17,8 +17,10 @@ event sourcing application has never been so easy!
 
 ### What is it?
 
-A lambda is just a small piece of code which complies to an interface. It can be written in Python, node.js
-and java 8.
+Lambda is a managed service offered by Amazon Web Services. A lambda is just a small piece of code which complies to an interface. It can be written in Python, node.js
+and java 8. You write a piece of code, you upload it in the AWS cloud and you let Amazon managed aspects like
+scaling, monitoring, configuration, ... and so on. You trigger it with others services like API Gateway
+or SNS.
 
 For Java, you have [differents way to create a lambda][java-lambda]. One way is to implement an interface:
 
@@ -141,10 +143,20 @@ events associated to this object. Using the same example with the bank account, 
 accounts like withdrawing of deposing money.  Not only you can evaluate the state of your account by replaying
 transactions, but you have the whole history in terms of business event (withdraw & deposit). You can use it
 for future needs (for example, what are the average desposit & withdraw every month?), you can track strange 
-events, you can prove why you are in this current state and so on. 
+events, you can prove why you are in this current state and so on. You can only go forward, no one is allowed to
+update the stream of events once it has been written. Really strong and great invariant!
 
-Event sourcing takes its root into DDD. To built it, you will need to find domains with their aggregated root and
-work on each domain to extract business events.
+![Active record vs. event sourcing](/images/2016-12-31-event-sourcing-steroids-0.png) 
+
+[From Michiel Rook][michiel-rook]
+
+Event sourcing is composed of three parts:
+ - Write part: it receives commands and issues events. In a functionnal way, we can see a command as : f<sub>command</sub>(state) -> event
+ - Processing part (also called projection) : take an event and update the state : g<sub>event</sub>(state) -> state
+ - Read part : read the state. h(x) -> state
+
+Event sourcing takes its root into [DDD][domain-driven-design]. To built it, you will need to find domains with their bounded contexts
+ and work on each domain to extract business events.
 
 Event sourcing can be though as a way to reveal the intention of your business by clearly using business events into 
 every exchange in the application.
@@ -153,13 +165,144 @@ Here is a great [presentation of this subject][event-sourcing-presentation].
 
 ### Price-tracking application
 
+We are going to use an application for tracking products. For the moment, we are only keeping the state of the price.
+Prices can increase or decrease. We can imagine a lot of modifications.
+
+The next picture is a simplfied event sourcing architecture with the AWS components :
+
 ![Architecture of an event sourcing application](/images/2016-12-31-event-sourcing-steroids-1.png){:class="img-responsive"}
+
+Messages are : 
+ # A command is sent (from UI, for example) to modify the product. 
+ - CreateProduct creates a new product with a price
+ - UpdateProduct indicates the variation in the price
+ - DeleteProduct makes the product unavailable
+ # Lambdas associated to the command processes it. 
+ # First, the aggregate representing the product is retrieve by retrieving all associated events and replaying them
+ # Then, based on the conditions (for example, only a product which has been created before can be update), a new event is created and stored. 
+ # The event is also published on the bus to notify everyone that something has happened
+ # The event is read
+ # Data is updated and stored in a  way that facilitates the read part. Note that we can have more than one lambda and read format.
+ # The UI can query the informations
 
 #### Description
 
+I try to keep the processing in one function in order to facilitate the understanding
+
+#### Reading the query
+
+Your Lambda needs to comply to an interface specified by AWS. 
+
+In order to read the query from API Gateway, you need to implement the input/ouput stream interface :
+
+{% highlight java %}
+@Override
+public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
+    ...
+}
+{% endhighlight %}
+
+Then, from the input stream, you will receive a json string with a body parameter. You will need to parse this body 
+to get the input parameters
+
 #### The read side
 
+The read part is really simple. It retrieves the id of product and returns the associated entry in the table.
+We use a raw JDBC connection to keep a thin and simple database layer. 
+
+Example for the query part : 
+
+{% highlight java %}
+Connection conn = database.getConnection();
+st = conn.prepareStatement(QUERY);
+st.setString(0, getRequest.getProductId());
+st.execute();
+ResultSet rs = st.getResultSet();
+if (rs.next()) {
+return new Response("" + rs.getDouble("price"));
+}
+{% endhighlight %}
+
+#### The processing part
+
+The processing part receives the event and apply some modifications to the data:
+
+{% highlight java %}
+@Override
+public Response handleRequest(ProcessRequest processRequest, Context context) {
+EventType eventType = EventType.valueOf(processRequest.getEvent());
+
+switch (eventType) {
+    case CREATE:
+	create(processRequest.getProductId(), processRequest.getValue());
+	break;
+    case UPDATE:
+	update(processRequest.getProductId(), processRequest.getValue());
+	break;
+    case DELETE:
+	delete(processRequest.getProductId());
+	break;
+
+}
+
+return new Response("OK");
+}
+{% endhighlight %}
+
+Depending on the event, we add, update or remove the entry in the read database.
+
+The approach is really naive (with switch).
+
+The lambda implements the RequestHandler interface.
+
 #### The write side
+
+Last but not the least, the write part. Let's have a look to the CreateCommand Lambda :
+
+{% highlight java %}
+Optional<Product> product = productRepository.getById(input.getProductId());
+return product
+	.map(x -> new Response("Failed to create product, product exists"))
+	.orElse(createProduct(input));
+{% endhighlight %}
+
+We retrieve the existing aggregate from the repository. If it doesn't exist, we publish 
+a new product with the event **ProductCreate**.
+
+Retrieving and building the aggregate:
+{% highlight java %}
+context.getLogger().log("Input " + input);
+Optional<Product> product = productRepository.getById(input.getProductId());
+return product
+	.map(x -> new Response("Failed to create product, product exists"))
+	.orElse(createProduct(input));
+{% endhighlight %}
+
+As you notice, we rebuilt the aggregate from events. Here, I have not introduced snapshots
+which allow us to have pre-build aggregates, so getting the aggregate is faster.
+
+## The easy part : deployment and test
+
+As you can see, we just have to fill the gap in functions. Deployment is as easy as **serverless deploy**,
+rollback is  **serverless rollback**. With informations defined in the file serverless.yml, serverless
+builds your stack, deploys your code and wires everything. 
+
+Some points should be highlighted too:
+ - Even if it is simple, it is not perfect. DynamoDB is a great database. It can also easily send back all stored events to your lambda.
+However, primary key system is limited. I can only create a key made of productId and date. If I receive two events at the same time,
+game over, the entry is updated.
+
+Event Sourcing has a lot of advantages and disavantages. It is not a [silver bullet][silver-bullet].
+It is true that you can do so many things : 
+ - Create multiple reads api, so you can tweak each of them separately
+ - Create new reads parts from the beginning of your history.
+ - Have everything you need even if you don't know what you can one day need it!
+
+
+However, the main drawback is that events you should be well captured and tailored with the business.
+A common tool you can use is event storming sessions to facilitate this process.
+
+[source][source]
 
 [amzon-web-services]: https://aws.amazon.com/
 [aws-lambda]: https://aws.amazon.com/lambda/
@@ -170,5 +313,9 @@ Here is a great [presentation of this subject][event-sourcing-presentation].
 [cli-ref-create]: https://serverless.com/framework/docs/providers/aws/cli-reference/create/
 [sparta]: https://github.com/mweagle/Sparta
 [greg-young-blog]: https://goodenoughsoftware.net/
+[michiel-rook]: http://www.slideshare.net/michieltcs/cqrs-event-sourcing-in-the-wild
+[domain-driven-design]: https://en.wikipedia.org/wiki/Domain-driven_design
 [event-sourcing-presentation]: https://www.youtube.com/watch?v=JHGkaShoyNs
 [aws-sam]: http://docs.aws.amazon.com/lambda/latest/dg/deploying-lambda-apps.html
+[silver-bullet]: https://en.wikipedia.org/wiki/No_Silver_Bullet
+[source]: https://github.com/cotonne/misc/es
