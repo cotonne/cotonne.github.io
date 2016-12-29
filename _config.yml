@@ -19,7 +19,8 @@ description: > # this means to ignore newlines until "baseurl:"
   This blog is about crafting softwares, thoughts about Agility,
   management and organization, technical challenges and a lot more!
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "http://cotonne.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+comments: true
 twitter_username: cotonne
 github_username:  cotonne
 
