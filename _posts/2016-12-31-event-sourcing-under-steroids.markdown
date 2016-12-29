@@ -318,4 +318,4 @@ A common tool you can use is event storming sessions to facilitate this process.
 [event-sourcing-presentation]: https://www.youtube.com/watch?v=JHGkaShoyNs
 [aws-sam]: http://docs.aws.amazon.com/lambda/latest/dg/deploying-lambda-apps.html
 [silver-bullet]: https://en.wikipedia.org/wiki/No_Silver_Bullet
-[source]: https://github.com/cotonne/misc/es
+[source]: https://github.com/cotonne/blog-code/tree/master/es-java
