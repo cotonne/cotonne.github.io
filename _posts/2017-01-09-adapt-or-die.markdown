@@ -25,7 +25,8 @@ This remark striked me. That reminded me one of the values from [Agile manifesto
 
 Even if precise plans have been prepared, it can't resist the reality of the market. You have ideas and you want to implement them. However, when
 you face concurrency, you have to be flexible and adapt to the situation. The manifesto has understood it well. If we were continuing following the
-plan, we would have been defeated soon. 
+plan, we would have been defeated soon. Even Sun Tzu from "[The Art of War][art-of-war]" said : "According as circunstances are favorable, one 
+should modify one's plan". You must be guided by the situation  in attempting to secure a more favorable position.
 
 Judo is a martial art. It means "gentle way". In french, it is translated into "flexibility way". What you should understand is not that you have to
 be like an acrobat in order to win, but you have to acquire a "flexibility" in your way of thinking. You try something against your opponent. If it 
@@ -46,4 +47,5 @@ Agile means that :
  - they have to be trusted and free
 
 [agile-manifesto]: http://agilemanifesto.org/
+[art-of-war]: https://en.wikipedia.org/wiki/The_Art_Of_War
 [decisions-absurdes]: https://www.amazon.fr/D%C3%A9cisions-absurdes-Sociologie-radicales-persistantes/dp/2070763021
