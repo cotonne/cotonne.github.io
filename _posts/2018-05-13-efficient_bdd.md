@@ -18,7 +18,7 @@ or:
 
     Behavior Driven Development
 
-You might know that Dan North coined as the one who defined "BDD". Born in UK, he used the word **"Behavior"** without a U.
+You might know that Dan North coined as the one who defined "BDD". Born in UK, he used the word **"Behaviour"** with a U.
 
 A brief definition of BDD: "BDD is about **understanding** & **validating** business requirements through illustrative examples".
 
