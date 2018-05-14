@@ -22,7 +22,9 @@ You might know that Dan North coined as the one who defined "BDD". Born in UK, h
 
 A brief definition of BDD: "BDD is about **understanding** & **validating** business requirements through illustrative examples".
 
-{% twitter https://twitter.com/yoda044/status/994857018061131777 %}
+<blockquote class="twitter-tweet" data-lang="fr"><p lang="en" dir="ltr">Yes, &quot;BDD is about *understanding* &amp; *validating* business requirements through illustrative examples&quot; Period <a href="https://twitter.com/sebrose?ref_src=twsrc%5Etfw">@sebrose</a> &amp; <a href="https://twitter.com/gasparnagy?ref_src=twsrc%5Etfw">@gasparnagy</a>  at <a href="https://twitter.com/hashtag/Craftconf?src=hash&amp;ref_src=twsrc%5Etfw">#Craftconf</a></p>&mdash; PHELIZOT Yvan (@yoda044) <a href="https://twitter.com/yoda044/status/994857018061131777?ref_src=twsrc%5Etfw">11 mai 2018</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
 
 We had an interesting debrief about the smells in BDD. You can find smells, best practices and advices in the next table.
 
