@@ -109,5 +109,4 @@ In order to improve its maintainability, some practices could be applied:
  - Simple Design (to maximize clarity and minimize complexity)
  - "object calisthenics" constraints (to improve expressivity)
 
-
-
+If you are interested, [I'm reimplementing parcoursup](https://github.com/cotonne/parcoursup). Feel free to send me reviews and requests.
