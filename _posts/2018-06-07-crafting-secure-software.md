@@ -16,9 +16,9 @@ You turn on your computer, open your mailbox. Suddenly, a lot of emails appears,
 
 ## Fixing the problem
 
-In no time, you start to investigate the problem. How can a negative value be proceed? The frontend checks that the value can not be more than 10. You understand that they are directly sending their request to the backend. The business team is in charge of the test. They are only using the web interface. Well, tested... Mainly checking that no regression has been introduced... Due to the absence of tests, most of the time is spent on testing that important features still works.
+In no time, you start to investigate the problem. How can a negative value proceed? The frontend checks that the value is between 0 and 10. You understand that they are directly sending their request to the backend. The business team is in charge of the test. They are only using the web interface. Well, tested... Mainly checking that no regression has been introduced... Due to the absence of tests, most of the time is spent on testing that important features still work.
 
-You continue to investigate. Surprisingly, the value, which is a quantity, is correctly enforced by the backend. If you send a negative value, the server responds with an "HTTP 400", indicating a bad request. However, the value received is a huge positive number. How can it become negative? 
+You continue to investigate. Surprisingly, the value, which is a quantity, is enforced by the backend. If you send a negative value, the server responds with an "HTTP 400", indicating a bad request. But, the value received is a huge positive number. How can it become negative? 
  
 You start to dive into the code. So messy! As an architect, you have been safe from writing code. 
 Now, a bunch of contractors does the "bad work". The small software you left some years ago has become a monster. After some time, you find this piece of code:
@@ -30,12 +30,12 @@ if ( quantity > 5 ) {
 }
 ```
 
-You quickly fix it. You run the tests. Gosh! They are either broken or ignored. There is almost no coverage of the code.
+You fix it. You run the tests. Gosh! They are either broken or ignored. There is almost no coverage of the code.
 
 ## What just happen?
 
 The strange number received was: 2147483647. Why don't you had an exception? You are puzzled. 
-Then, you start to remember your lessons from school. The number is an integer, interpreted as a set of bits with a limited size. When you add one, the sign is inverted: that's an **Integer Overflow**!
+Then, you start to remember your lessons at school. The number is an integer, interpreted as a set of bits with a limited size. When you add one, the sign is inverted: that's an **Integer Overflow**!
 
 You comment this line of code. "In how many places do we do something like this?". After some research, you find a lot of similar things for calculating the price (you have discounts resulting in a negative value, ...). Your day is not over...
 
@@ -45,11 +45,11 @@ What can be the cause of this situation? I would say that one of the main reason
 
 Another reason is the messy code. The lack of consistency can be seen in the manipulation of quantity. Also, The cognitive charge to understand the code doesn't help to view the "big picture". The lack of tests goes in the way if you want to refactor the code.
 
-A quote that clearly states this situation is: *"You can't have quality without security."*
+A quote that states this situation is: *"You can't have quality without security."*
 
 # Crafting secure software
 
-Let's explore the relation between Security and Quality. You can have Quality by crafting software. Crafting here means applying quality-code technics like TDD, Clean Coe, Pair Programming, ... in order to get a well-design software which answers to all the requirements of your business.
+Let's explore the relation between Security and Quality. You can have Quality by crafting software. Crafting here means applying quality-code technics like TDD, Clean Coe, Pair Programming, ... to get a well-design software which answers to all the requirements of your business.
 
 Given the fact we want to maximize the security aspect for an amount of time, we should focus on the central/core/money generating/business sensitive part of your application. Hardening it will also prevent new vulnerabilities to appear when you change the rest. It does mean that the new technologies will come with vulnerability-free features ;).
 
@@ -61,7 +61,7 @@ Secure coding can be understood in two ways:
  - Following technical advice from guidelines (like the [Java Secure Coding Guidelines](http://www.oracle.com/technetwork/java/seccodeguide-139067.html))
  - Or using a style of programming where you develop in a way to prevent vulnerabilities. I will focus on this one which doesn't depend on the technology you are working on.
 
-When you apply this style of programming, you will enforce conditions in order to prevent well-known attacks.
+When you apply this style of programming, you will enforce conditions to prevent well-known attacks.
 
 For example, you can have a function for defining the price. Normally, you will do like :
 
@@ -74,7 +74,7 @@ int calculatePrice(int quantity, int pricePerProduct) {
 Applying a secure coding approach, you know that both quantity, price and final price can't be negative. So, you will enforce this property :
 
 ```java
-int calculatePrice(in quantity, int pricePerProduct) {
+int calculatePrice(int quantity, int pricePerProduct) {
   if (quantity < 0) throw new IllegalStateException();
   if (price < 0) throw new IllegalStateException();
   int finalPrice =  quantity * price;
@@ -85,13 +85,13 @@ int calculatePrice(in quantity, int pricePerProduct) {
 
 The style is close to defensive programming. The difference is that we look for corner and dangerous cases. Doing so, we tend to think also in a business way, asking about where is the limit. Here, we can ask: "Do you think 2 billion is a reasonable quantity? No? Can you define what is a normal quantity? Should we prevent or ask for special acknowledgment?". In this way, security helps us to find new business scenarios.
 
-However, this is not perfect. Looking at the previous piece of code, we can spot a lot of duplication (test of a positive quantity). Moreover, we have to be sure that the logic is respected in every part of our software. Isn't there a way to do it?
+But, this is not perfect. Looking at the previous piece of code, we can spot a lot of duplication (test of a positive quantity). Moreover, we have to be sure that the logic is respected in every part of our software. Isn't there a way to do it?
 
 ### Crafting Quality Software brings Security
 
 #### The importance of testing
 
-In order to verify the rules, you can use two strong technics: Secure TDD and Property-based testing.
+To verify the rules, you can use two strong technics: Secure TDD and Property-based testing.
 
 Secure TDD means that you will define unit tests which will check that your system can't be used in an illegal way. For example, you need to verify that a password is strong enough. So, you will add tests for testing rules (one letter, one number, ...). You will also look for strange passwords that should not be accepted (with dangerous characters or exotic characters). When defining your test cases, you should also consider extreme/special values (like 0, 1, -1,  Integer.MAX_VALUE, ...).
 
@@ -124,7 +124,7 @@ For objects with a state, you should take care of auditability, the property tha
 
 #### Thinking in a mathematical way
 
-A strong tool against mistakes is mathematics. 
+A strong tool against mistakes in mathematics. 
 
 Introducing algebra of types, function composition, ... and a lot of things coming
 from Functional Programming (FP) can leverage the complexity of your system. For example, 
@@ -139,7 +139,7 @@ public class Quantity {
         }
 }
 ```
-We got : **add: Quantity -> Quantity**. I strongly advise having a look to FP and what it
+We got : **add: Quantity -> Quantity**. I strongly advise having a look at FP and what it
 can bring you in terms of designs (composition, monads, ...).
 
 Types can serve as a "poka-yoke", a term from Lean which means a "keyed". Let's imagine the following functions:
@@ -172,7 +172,7 @@ You can see this as a **Security in Depth** approach.
 
 ### Quick wins
 
-You can look for quick wins. You can include a lot of tools into your CI/CD in order to detect common weaknesses. Tools like OWASP ZAP can detect Reflected XSS, missing HTTP headers, ...
+You can look for quick wins. You can include a lot of tools in your CI/CD to detect common weaknesses. Tools like OWASP ZAP can detect Reflected XSS, missing HTTP headers, ...
 
 According to [Sonatype](https://blog.sonatype.com/2014/11/42000-nexus-repository-managers-and-growing/),
 
