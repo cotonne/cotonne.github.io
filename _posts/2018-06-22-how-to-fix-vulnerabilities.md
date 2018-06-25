@@ -7,21 +7,21 @@ categories: secure design methodology craft
 
 Some days ago, I was with a client. An audit has revealed some weaknesses. As a good habit, he wanted to fix them. But, correcting weaknesses are not so easy, even more, if the codebase is a legacy one.
 
-In this article, I will take about the resolution of one of the weaknesses: path transversal. We will see how to treat the problem. Then let's find what is the root cause of this vulnerability. Some technics can help us in preventing the apparition of such vulnerability.
+In this article, I will talk about the resolution of one of the weaknesses: path transversal. We will see how to treat the problem. Then let's find what is the root cause of this vulnerability. Some technics can help us in preventing the apparition of such vulnerability.
 
 # What is a Path transversal vulnerability?
 
-Imagine that you have a webpage design used as a download page. You can store your file in a remote server ("/a/b" for example). Your user provides the file and a name ("data" for example). The application saves the file into the remote file **/a/b/data**.
+Imagine that you have a webpage used as a download page. You can store your file in a remote server ("/a/b" for example). Your user provides the file and a name ("data" for example). The application saves the file into the remote file **/a/b/data**.
 
-But what if he provides a value like "../../etc/paswd" as a name. The application will saves the file as **/a/b/../../etc/passwd**. If we normalize the path, we got **/etc/passwd**. So, given the fact that your application can have root access, you can manipulate important configuration files from your server.
+But what if he provides a value like "../../etc/paswd" as a name. The application will saves the file as **/a/b/../../etc/passwd**. If we normalize the path, we got **/etc/passwd**. So, given the fact that your application can have root access, the user can manipulate important configuration files from your server.
 
 # Fix it!
 
-The first thing to do is to fix the problem and to fix it. How can we fix it in an efficient way? How can we be sure that the vulnerability will not come back?
+The first thing to do is to fix the problem. How can we fix it in an efficient way? How can we be sure that the vulnerability will not come back?
 
 ## Test it!
 
-You need to have different test cases. You can use the [OWASP Path Transversal](https://www.owasp.org/index.php/Testing_Directory_traversal/file_include_(OTG-AUTHZ-001)) as a source of inspiration.
+You need to have different test cases. Those test cases will be the base for testing that your fix works. You can use the [OWASP Path Transversal](https://www.owasp.org/index.php/Testing_Directory_traversal/file_include_(OTG-AUTHZ-001)) as a source of inspiration.
 
 Given your architecture, you will need to test
  - for different platforms (Windows, Unix, ...)
@@ -64,9 +64,9 @@ public class SanitizerShould {
 }
 ```
 
-I will advise you to have a whitelist approach. In fact, you can have unknown cases, so you need as restrictive as you can. Even with this approach, this is not bullet-proof so be careful.
+I will advise you to have a whitelist approach. There can be unknown cases, so you need as restrictive as you can. Even with this approach, this is not bullet-proof so be careful.
 
-You can mix this approach:
+You can also mix them:
  - A blacklist of dangerous characters (like /). If you find any, the application can reject the request and generates an alert. It is not a normal and expected value that the front can send.
  - A whitelist of valid characters 
 
@@ -99,7 +99,7 @@ We want to find the root cause of the problem.
 # Why does it happen to me?
 
 Different principles from secure by design principles should have been applied 
- - **Trust cautiously**: we have not imagined that the user or someone could send use invalid or dangerous values
+ - **Trust cautiously**: we have not imagined that the user or someone could send use invalid or dangerous values. We should have been more suspicious when we received data.
  - **Least privilege**: our application has too many rights. The application should not have been able to access other folders except the upload folder. Even in this case, we need to check the rights of a user to access a file (**Complete Mediation**)
  - **Defense in depth**: we should have designed our application to have many lines of defense. For example, we can use some controls in the code **and** a specific user to restrict rights of the application
  - **KISS**: the codebase was complex. Security vulnerabilities are a pay off of technical debt.  You need to constantly invest in the remediation of the debt even for end-of-life applications. New vulnerabilities are discovered every day. So even if your application is safe today, it doesn't mean it will be safe tomorrow.
@@ -120,7 +120,7 @@ You can also try contests like [CTF](https://en.wikipedia.org/wiki/Capture_the_f
 
 To limit rights, there are a lot of different ways:
  - application-specific: you implement a way to check and restrict rights. You can develop an RBAC or ABAC system. Yet, you need to be careful as it is a sensitive and complex functionality. Reuse as much as you can safe, tested and trusted software.
- - framework-specific: some frameworks have built-in solutions for such problems. For example, Java has a special file called ["Java Security Policy"](https://docs.oracle.com/javase/7/docs/technotes/guides/security/PolicyFiles.html) where you define fine-grained rights. By default, it denies access to resources **default deny**. So you need to be specific. If not, you can have the following exception
+ - framework-specific: some frameworks have built-in solutions for such problems. For example, the JVM has a special file called ["Java Security Policy"](https://docs.oracle.com/javase/7/docs/technotes/guides/security/PolicyFiles.html) where you define fine-grained rights. By default, it denies access to resources (**default deny**). So you need to be specific. If not, you can have the following exception
 
 ```
 Exception in thread "main" java.security.AccessControlException: access denied ("java.io.FilePermission" "<a_file>" "write")
@@ -131,9 +131,9 @@ Exception in thread "main" java.security.AccessControlException: access denied (
 
 ## KISS
 
-A good way to keep your codebase in a good shape is to look at the practices from the craft community: TDD, Clean Code, Craftsmanship spirit and so on.
+A way to keep your codebase in a good shape is to look at the practices from the craft community: TDD, Clean Code, Craftsmanship spirit and so on.
 
-To not lost security rules, like input validation rules for path, you can define a class designed to encapsulate a dangerous input:
+To not lose security rules, like input validation rules for path, you can define a class designed to encapsulate a dangerous input:
 ```java
     private class SafeFile {
         private final String name;
