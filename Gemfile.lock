@@ -57,7 +57,7 @@ GEM
     rouge (3.1.1)
     ruby_dep (1.5.0)
     safe_yaml (1.0.4)
-    sass (3.5.6)
+    sass (3.5.7)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
@@ -73,7 +73,7 @@ DEPENDENCIES
   minima (~> 2.5)
 
 RUBY VERSION
-   ruby 2.3.3p222
+   ruby 2.5.1p57
 
 BUNDLED WITH
-   1.15.1
+   1.16.2

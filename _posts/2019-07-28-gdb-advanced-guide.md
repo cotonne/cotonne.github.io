@@ -37,7 +37,6 @@ base address, you can use:
 Updating the memory is really simple
 
    > set *(0x08001234)=0x41414141
-   > set *(0x08001234)=0x41414141
 
 Memory are divided in different parts: program, stack, heap, ... To know which parts
 you are modifying, you call the following command:
@@ -73,9 +72,10 @@ eax to 0, just do:
 If you want to change a flag, which is a one-bit element of the eflags register, you can use
 boolean operation. For example, to change ZF, the 6th bit of eflags:
 
-    set $eflags |= (1 << $ZF)   # set ZF bit in EFLAGS
-    set $eflags &= ~(1 << $ZF)  # clear
-    set $eflags ^= (1 << $ZF)   # toggle
+    set $eflags |= (1 << 6)   # set ZF bit in EFLAGS
+    set $eflags &= ~(1 << 6)  # clear
+    set $eflags ^= (1 << 6)   # toggle
+    i r $eflags               # view the state of flags
 
 ## Going somewhere else
 
