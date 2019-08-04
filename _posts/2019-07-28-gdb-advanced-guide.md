@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "GDB - An advanced guide"
-date:   2019-07-08 08:42:27 +0100
+date:   2019-07-28 08:42:27 +0100
 categories: gdb 
 ---
 
