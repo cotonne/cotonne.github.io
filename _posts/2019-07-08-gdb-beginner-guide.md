@@ -44,7 +44,7 @@ To provide arguments, you can do it at the beginning or directly from GDB:
 You can also pipe content to the program
 
     $ gdb ./my.elf
-    > run < $(python -c 'print("A"*10)')
+    > run < <(python -c 'print("A"*10)')
 
 # Debugging a program
 
