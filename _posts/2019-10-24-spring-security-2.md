@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Spring"
+title:  "Deep dive into Spring Security - part 2"
 date:   2019-10-24 08:42:27 +0100
 categories: gdb 
 ---
