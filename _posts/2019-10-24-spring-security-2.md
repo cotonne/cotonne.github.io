@@ -2,7 +2,7 @@
 layout: post
 title:  "Deep dive into Spring Security - part 2"
 date:   2019-10-24 08:42:27 +0100
-categories: gdb 
+categories: java spring security
 ---
 
 Understanding Spring Security - part 2
